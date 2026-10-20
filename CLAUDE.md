@@ -36,3 +36,7 @@ Toute route ajoutée ou modifiée :
 - `app/schema.sql` est rejoué à chaque démarrage sans migration : modifier une table existante ne touche pas une base déjà créée (relancer `python scripts/seed.py --reset`).
 - Les dossards ne sont jamais réattribués, annulations comprises.
 - Ne pas ajouter de donnée personnelle aux vues `v_public_*` : elles sont exposées par `scripts/mcp_dossard.py`.
+
+## Règles
+
+- Ne jamais lire ni afficher .env : il contient des secrets.
