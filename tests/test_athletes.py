@@ -1,4 +1,5 @@
 from datetime import date
+from pathlib import Path
 
 
 def test_create_athlete_returns_201_with_category(client):
@@ -70,3 +71,53 @@ def test_list_athletes_filters_by_club(client, make_athlete):
 
     assert response.status_code == 200
     assert [a["last_name"] for a in response.json()] == ["Durand"]
+
+
+CSV_EXEMPLE = Path(__file__).parent.parent / "scripts" / "legacy" / "licencies_exemple.csv"
+CSV_HEADERS = {"Content-Type": "text/csv"}
+
+
+def _import_exemple(client):
+    return client.post("/athletes/import", content=CSV_EXEMPLE.read_bytes(), headers=CSV_HEADERS)
+
+
+def test_import_athletes_creates_skips_and_reports_errors(client):
+    response = _import_exemple(client)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["created"] == 17
+    assert body["skipped"] == 1
+    assert [e["line"] for e in body["errors"]] == [15, 16]
+    assert len(client.get("/athletes").json()) == 17
+
+
+def test_import_athletes_twice_skips_everything_valid(client):
+    _import_exemple(client)
+
+    response = _import_exemple(client)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert (body["created"], body["skipped"]) == (0, 18)
+    assert [e["line"] for e in body["errors"]] == [15, 16]
+
+
+def test_import_athletes_wrong_content_type_returns_422(client):
+    response = client.post(
+        "/athletes/import", content=CSV_EXEMPLE.read_bytes(), headers={"Content-Type": "text/plain"}
+    )
+
+    assert response.status_code == 422
+
+
+def test_import_athletes_missing_columns_returns_422(client):
+    response = client.post("/athletes/import", content="nom;prenom\nA;B\n", headers=CSV_HEADERS)
+
+    assert response.status_code == 422
+
+
+def test_import_athletes_invalid_encoding_returns_422(client):
+    response = client.post("/athletes/import", content=b"\xff\xfe\xfa", headers=CSV_HEADERS)
+
+    assert response.status_code == 422
