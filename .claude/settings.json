@@ -14,7 +14,22 @@
       "PowerShell(gc .env*)",
       "PowerShell(cat .env*)",
       "PowerShell(type .env*)",
-      "PowerShell(Select-String * .env*)"
+      "PowerShell(Select-String * .env*)",
+      "Edit(scripts/legacy/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/garde.py"]
+          }
+        ]
+      }
     ]
   }
 }
