@@ -1,3 +1,6 @@
+import csv
+import io
+
 import pytest
 
 
@@ -87,6 +90,24 @@ def test_record_result_invalid_performance_returns_422(client):
     response = client.put("/registrations/1/result", json={"performance": -1})
 
     assert response.status_code == 422
+
+
+def test_export_csv_club_with_comma_keeps_columns_aligned(
+    client, make_competition, make_event, make_athlete, make_registration
+):
+    competition = make_competition(status="open")
+    event = make_event(competition["id"])
+    athlete = make_athlete(club="Athlé, Paris 15")
+    registration = make_registration(event["id"], athlete["id"])
+    client.patch(f"/competitions/{competition['id']}", json={"status": "closed"})
+    client.put(f"/registrations/{registration['id']}/result", json={"performance": 11.9})
+
+    response = client.get(f"/competitions/{competition['id']}/results.csv")
+
+    assert response.status_code == 200
+    header, row = list(csv.reader(io.StringIO(response.text)))
+    assert dict(zip(header, row, strict=True))["club"] == "Athlé, Paris 15"
+    assert row[-1] == "11.9"
 
 
 def test_export_csv_unknown_competition_returns_404(client):
