@@ -40,3 +40,7 @@ Toute route ajoutée ou modifiée :
 ## Règles
 
 - Ne jamais lire ni afficher .env : il contient des secrets.
+
+## Revue en CI
+
+Toute revue de pull request faite en CI se termine par la ligne exacte `Revue CI — relu par Claude`.
