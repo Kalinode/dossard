@@ -1,5 +1,7 @@
 {
   "permissions": {
+    "allow": ["mcp__dossard__list_views"],
+    "ask": ["mcp__dossard__query_view"],
     "deny": ["Read(./.env)", "Edit(scripts/legacy/**)"]
   },
   "hooks": {
@@ -14,7 +16,19 @@
             "onFailure": "block"
           }
         ]
-      }
+      },
+      {
+  "matcher": "mcp__dossard__.*",
+  "hooks": [
+    {
+      "type": "command",
+      "command": "python",
+      "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/journal_mcp.py"],
+      "onFailure": "block"
+    }
+  ]
+}
+
     ],
     "PostToolUse": [
       {
