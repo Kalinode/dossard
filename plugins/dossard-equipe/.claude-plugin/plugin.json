@@ -1,0 +1,5 @@
+{
+  "name": "dossard-equipe",
+  "description": "Outillage partagé de l'équipe dossard : skill api-conventions, hooks de garde, de formatage, de journal MCP et de tests, et serveur MCP en lecture seule.",
+  "version": "1.0.0"
+}
