@@ -13,12 +13,17 @@ router = APIRouter(tags=["registrations"])
     "/events/{event_id}/registrations",
     response_model=RegistrationOut,
     status_code=status.HTTP_201_CREATED,
+    summary="Inscrire un athlète à une épreuve",
 )
 def create_registration(event_id: int, data: RegistrationCreate, conn: Conn) -> RegistrationOut:
     return registrations.create_registration(conn, event_id, data.athlete_id)
 
 
-@router.patch("/registrations/{registration_id}", response_model=RegistrationOut)
+@router.patch(
+    "/registrations/{registration_id}",
+    response_model=RegistrationOut,
+    summary="Changer le statut d'une inscription",
+)
 def update_registration(
     registration_id: int, data: RegistrationUpdate, conn: Conn
 ) -> RegistrationOut:
