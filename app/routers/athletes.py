@@ -12,7 +12,7 @@ from app.schemas import AthleteCreate, AthleteImportResult, AthleteOut
 router = APIRouter(prefix="/athletes", tags=["athletes"])
 
 
-@router.get("", response_model=list[AthleteOut])
+@router.get("", response_model=list[AthleteOut], summary="Lister les athlètes")
 def list_athletes(
     conn: Conn,
     club: str | None = None,
@@ -22,17 +22,26 @@ def list_athletes(
     return athletes.list_athletes(conn, club=club, limit=limit, offset=offset)
 
 
-@router.get("/{athlete_id}", response_model=AthleteOut)
+@router.get("/{athlete_id}", response_model=AthleteOut, summary="Consulter un athlète")
 def get_athlete(athlete_id: int, conn: Conn) -> AthleteOut:
     return athletes.get_athlete(conn, athlete_id)
 
 
-@router.post("", response_model=AthleteOut, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=AthleteOut,
+    status_code=status.HTTP_201_CREATED,
+    summary="Créer un athlète",
+)
 def create_athlete(data: AthleteCreate, conn: Conn) -> AthleteOut:
     return athletes.create_athlete(conn, data)
 
 
-@router.post("/import", response_model=AthleteImportResult)
+@router.post(
+    "/import",
+    response_model=AthleteImportResult,
+    summary="Importer les athlètes depuis le CSV de la fédération",
+)
 async def import_athletes(request: Request, conn: Conn) -> AthleteImportResult:
     """Importe le CSV brut de la fédération (text/csv, séparateur `;`, dates jj/mm/aaaa)."""
     if request.headers.get("content-type", "").split(";")[0].strip().lower() != "text/csv":
